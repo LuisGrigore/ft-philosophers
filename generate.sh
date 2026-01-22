@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Format
-
 c_formatter_42 $(find . -type f \( -name "*.c" -o -name "*.h" \))
 
 # Comprobar si se pasó un argumento para el nombre del programa
@@ -11,17 +10,32 @@ else
     NAME="programa"
 fi
 
+# Comprobar si se pasó un segundo argumento para el subdirectorio (ej: libft/)
+if [ -n "$2" ]; then
+    SUBSYSTEM_PATH="$2"
+    SUBSYSTEM_LIB="$(basename "$SUBSYSTEM_PATH").a"
+else
+    SUBSYSTEM_PATH=""
+    SUBSYSTEM_LIB=""
+fi
+
 # Configuración del compilador y flags
 CC="cc"
 CFLAGS="-Wall -Wextra -Werror"
-INCLUDES="-I./includes -I./includes_copy"
+
+# Buscar directorios que contienen archivos .h y construir -I<dir>
+INCLUDE_DIRS=$(find . -type f -name "*.h" -exec dirname {} \; | sort -u)
+INCLUDES=""
+for dir in $INCLUDE_DIRS; do
+    INCLUDES+=" -I$dir"
+done
 
 # Directorios
-SRC_DIR="./src"
+SRC_DIR="./"
 OBJ_DIR="obj"
 
 # Generar la lista de fuentes
-SRCS_LIST=($(ls "$SRC_DIR"/*.c))  # Array con todos los archivos .c
+SRCS_LIST=($(find "$SRC_DIR" -type f -name "*.c"))  # Array con todos los archivos .c
 
 # Construir la variable SRCS
 SRCS="SRCS= "
@@ -42,28 +56,81 @@ NAME    = $NAME
 
 $SRCS
 
-OBJS    = \$(SRCS:./src/%.c=\$(OBJ_DIR)/src/%.o)
+OBJS = \$(SRCS:%.c=\$(OBJ_DIR)/%.o)
 
+EOL
+
+# Si hay un subdirectorio, añadimos reglas de subsystem
+if [ -n "$SUBSYSTEM_PATH" ]; then
+cat >> Makefile <<EOL
+SUBSYSTEM_PATH = $SUBSYSTEM_PATH
+SUBSYSTEM_LIB  = $SUBSYSTEM_LIB
+
+all: subsystems \$(NAME)
+
+subsystems:
+	\$(MAKE) -C \$(SUBSYSTEM_PATH) all
+
+\$(NAME): \$(OBJS) \$(SUBSYSTEM_LIB)
+	\$(CC) \$(CFLAGS) \$(INCLUDES) -o \$@ \$^
+EOL
+else
+cat >> Makefile <<EOL
 all: \$(NAME)
 
 \$(NAME): \$(OBJS)
 	\$(CC) \$(CFLAGS) \$(INCLUDES) -o \$@ \$^
+EOL
+fi
 
-\$(OBJ_DIR)/src/%.o: ./src/%.c | \$(OBJ_DIR)/src
-	\$(CC) \$(CFLAGS) \$(INCLUDES) -c \$< -o \$@
+# Reglas comunes
+cat >> Makefile <<'EOL'
 
-\$(OBJ_DIR)/src:
-	mkdir -p \$@
+$(OBJ_DIR)/%.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR):
+	mkdir -p $@
 
 clean:
+EOL
+
+if [ -n "$SUBSYSTEM_PATH" ]; then
+cat >> Makefile <<EOL
+	\$(MAKE) -C \$(SUBSYSTEM_PATH) clean
 	rm -rf \$(OBJ_DIR)
+EOL
+else
+cat >> Makefile <<EOL
+	rm -rf \$(OBJ_DIR)
+EOL
+fi
+
+cat >> Makefile <<'EOL'
 
 fclean: clean
+EOL
+
+if [ -n "$SUBSYSTEM_PATH" ]; then
+cat >> Makefile <<EOL
+	\$(MAKE) -C \$(SUBSYSTEM_PATH) fclean
 	rm -f \$(NAME)
+EOL
+else
+cat >> Makefile <<EOL
+	rm -f \$(NAME)
+EOL
+fi
+
+cat >> Makefile <<'EOL'
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re subsystems
 EOL
 
 echo "Makefile generado correctamente con nombre de programa: $NAME"
+if [ -n "$SUBSYSTEM_PATH" ]; then
+    echo "Incluyendo subdirectorio: $SUBSYSTEM_PATH"
+fi

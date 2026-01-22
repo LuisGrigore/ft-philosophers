@@ -1,23 +1,24 @@
 CC      = cc
 CFLAGS  = -Wall -Wextra -Werror
-INCLUDES= -I./includes -I./includes_copy
+INCLUDES=  -I./bool -I./includes
 
 OBJ_DIR = obj
-NAME    = philosophers
+NAME    = philo
 
-SRCS= ./src/exit.c ./src/init_table.c ./src/input_parser.c ./src/main.c ./src/safe_malloc.c ./src/safe_mutex.c ./src/safe_thred.c ./src/simulate.c
+SRCS= ./src/simulate.c ./src/init_table.c ./src/exit.c ./src/input_parser.c ./src/safe_thred.c ./src/safe_malloc.c ./src/main.c ./src/safe_mutex.c
 
-OBJS    = $(SRCS:./src/%.c=$(OBJ_DIR)/src/%.o)
+OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $^
 
-$(OBJ_DIR)/src/%.o: ./src/%.c | $(OBJ_DIR)/src
+$(OBJ_DIR)/%.o: %.c
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(OBJ_DIR)/src:
+$(OBJ_DIR):
 	mkdir -p $@
 
 clean:
@@ -28,4 +29,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re subsystems
