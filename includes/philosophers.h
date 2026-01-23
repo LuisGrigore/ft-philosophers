@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 16:25:59 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 17:55:55 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 19:32:01 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef struct s_philo
 	t_fork				*right_fork;
 	pthread_t			thread_id;
 	t_table				*table;
+	t_mutex				philo_mutex;
 }						t_philo;
 
 struct					s_table
@@ -54,8 +55,19 @@ struct					s_table
 	t_mutex				print_mutex;
 };
 
+typedef enum e_status
+{
+	EATING,
+	SLEEPING,
+	THINKING,
+	FORK_TAKEN,
+	RIGHT_FORK_TAKEN,
+	DIED,
+}						t_status;
+
 void					exit_with_error_msg(const char *msg);
 long					get_time_ms(void);
+void					safe_log_status(t_status status, t_philo *philo);
 
 void					parse_input(t_table *table, const char **argv);
 

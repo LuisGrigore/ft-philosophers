@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:15:12 by lgrigore          #+#    #+#             */
-/*   Updated: 2025/09/21 13:57:02 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 19:40:24 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ static long	ft_atol(const char *str)
 	}
 	return (sign * x);
 }
+
 static int	ft_isdigit(int c)
 {
 	if ((c >= '0' && c <= '9'))
@@ -49,6 +50,7 @@ static int	ft_isdigit(int c)
 	}
 	return (0);
 }
+
 static int	ft_isdigit_str(const char *str)
 {
 	int	i;

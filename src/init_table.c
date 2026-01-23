@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:59:35 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 17:52:40 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 19:40:03 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ static void	init_philos(t_table *table)
 		current_philo->is_full = false;
 		current_philo->meal_counter = 0;
 		current_philo->table = table;
-		if (current_philo->id % 2)
+		safe_mutex_op(&current_philo->philo_mutex, INIT);
+		if (current_philo->id % 2 == 0)
 		{
 			current_philo->right_fork = &table->forks[i];
 			current_philo->left_fork = &table->forks[(i + 1)
@@ -62,4 +63,5 @@ void	init_table(t_table *table)
 	init_forks(table);
 	init_philos(table);
 	safe_mutex_op(&table->table_mutex, INIT);
+	safe_mutex_op(&table->print_mutex, INIT);
 }
