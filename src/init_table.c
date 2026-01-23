@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:59:35 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 16:58:16 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 17:52:40 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,5 @@ void	init_table(t_table *table)
 	table->forks = safe_malloc(sizeof(t_fork) * table->number_of_philosophers);
 	init_forks(table);
 	init_philos(table);
-	safe_mutex_op(&table->mutex, INIT);
+	safe_mutex_op(&table->table_mutex, INIT);
 }

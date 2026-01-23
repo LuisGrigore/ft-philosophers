@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 16:25:59 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 17:38:08 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 17:55:55 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ struct					s_table
 	t_fork				*forks;
 	bool				end_simulation;
 	bool				start_simulation;
-	t_mutex				mutex;
+	t_mutex				table_mutex;
+	t_mutex				print_mutex;
 };
 
 void					exit_with_error_msg(const char *msg);
@@ -59,6 +60,8 @@ long					get_time_ms(void);
 void					parse_input(t_table *table, const char **argv);
 
 void					init_table(t_table *table);
+
+void					start_simulation(t_table *table);
 
 typedef enum e_mux_op
 {
