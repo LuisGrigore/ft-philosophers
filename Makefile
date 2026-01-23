@@ -1,11 +1,11 @@
 CC      = cc
 CFLAGS  = -Wall -Wextra -Werror
-INCLUDES=  -I./bool -I./includes
+INCLUDES=  -I./includes
 
 OBJ_DIR = obj
-NAME    = philo
+NAME    = philosophers
 
-SRCS= ./src/simulate.c ./src/init_table.c ./src/exit.c ./src/input_parser.c ./src/safe_thred.c ./src/safe_malloc.c ./src/main.c ./src/safe_mutex.c
+SRCS= ./src/simulate.c ./src/init_table.c ./src/utils.c ./src/input_parser.c ./src/safe_thred.c ./src/safe_access.c ./src/safe_malloc.c ./src/main.c ./src/safe_mutex.c
 
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 

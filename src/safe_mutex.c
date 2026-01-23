@@ -6,13 +6,13 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 14:11:47 by lgrigore          #+#    #+#             */
-/*   Updated: 2025/09/21 14:50:33 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/23 17:15:37 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-static void	handle_thread_return(int return_code, t_mux_op op)
+static void	handle_mutex_return(int return_code, t_mux_op op)
 {
 	if (return_code == 0)
 		return ;
@@ -29,11 +29,11 @@ static void	handle_thread_return(int return_code, t_mux_op op)
 void	safe_mutex_op(t_mutex *mux, t_mux_op op)
 {
 	if (op == LOCK)
-		handle_thread_return(pthread_mutex_lock(mux), op);
+		handle_mutex_return(pthread_mutex_lock(mux), op);
 	else if (op == UNLOCK)
-		handle_thread_return(pthread_mutex_unlock(mux), op);
+		handle_mutex_return(pthread_mutex_unlock(mux), op);
 	else if (op == FREE)
-		handle_thread_return(pthread_mutex_destroy(mux), op);
+		handle_mutex_return(pthread_mutex_destroy(mux), op);
 	else if (op == INIT)
-		handle_thread_return(pthread_mutex_init(mux, NULL), op);
+		handle_mutex_return(pthread_mutex_init(mux, NULL), op);
 }
