@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:07:08 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/24 03:20:46 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 15:29:37 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,6 @@ int	main(int argc, char const **argv)
 	parse_input(&table, argv);
 	init_table(&table);
 	start_simulation(&table);
-	//clean(&table);
+	clean(&table);
 	return (0);
 }

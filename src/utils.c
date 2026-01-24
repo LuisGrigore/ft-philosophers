@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:05:18 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/24 02:27:20 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 15:59:23 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 long	get_time_ms(void)
 {
@@ -68,4 +69,17 @@ void	clean(t_table *table)
 	safe_mutex_op(&table->print_mutex, FREE);
 	free(table->forks);
 	free(table->philos);
+}
+
+void safe_usleep(long usec)
+{
+    long start = get_time_ms();
+    long target = usec / 1000;
+
+    while ((get_time_ms() - start) < target)
+    {
+        long remaining = target - (get_time_ms() - start);
+        if (remaining > 1)
+            usleep(remaining * 500);
+    }
 }

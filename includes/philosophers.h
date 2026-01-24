@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 16:25:59 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/24 02:02:30 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 13:27:40 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void					exit_with_error_msg(const char *msg);
 long					get_time_ms(void);
 void					safe_log_status(t_status status, t_philo *philo);
 void					clean(t_table *table);
+void					safe_usleep(long usec);
 
 void					parse_input(t_table *table, const char **argv);
 
