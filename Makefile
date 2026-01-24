@@ -3,7 +3,7 @@ CFLAGS  = -Wall -Wextra -Werror
 INCLUDES=  -I./includes
 
 OBJ_DIR = obj
-NAME    = philosophers
+NAME    = Philosophers
 
 SRCS= ./src/simulate.c ./src/init_table.c ./src/utils.c ./src/input_parser.c ./src/safe_thred.c ./src/safe_access.c ./src/safe_malloc.c ./src/main.c ./src/safe_mutex.c
 

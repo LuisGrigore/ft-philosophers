@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:05:18 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 19:18:43 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 02:27:20 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,17 @@ void	safe_log_status(t_status status, t_philo *philo)
 	else if (status == DIED)
 		printf("%-6ld %d died\n", time_passed, philo->id);
 	safe_mutex_op(&philo->table->print_mutex, UNLOCK);
+}
+
+void	clean(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	while (++i < table->n_philos)
+		safe_mutex_op(&(table->philos + i)->philo_mutex, FREE);
+	safe_mutex_op(&table->table_mutex, FREE);
+	safe_mutex_op(&table->print_mutex, FREE);
+	free(table->forks);
+	free(table->philos);
 }

@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:15:12 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 19:40:24 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 02:55:18 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ static long	parse_time(const char *str)
 		exit_with_error_msg("Arguments must be numeric.");
 	time = ft_atol(str);
 	if (time < 60 || time > INT_MAX)
-		exit_with_error_msg("<time_to_die> <time_to_eat> <time_to_sleep> should be numbers between 60 and INT_MAX.");
+		exit_with_error_msg("<time_to_die> <time_to_eat> <time_to_sleep> "
+							"should be numbers between 60 and INT_MAX.");
 	return (time);
 }
 
@@ -87,9 +88,8 @@ void	parse_input(t_table *table, const char **argv)
 {
 	if (!ft_isdigit_str(argv[1]))
 		exit_with_error_msg("<num> must be a positive number.");
-	table->number_of_philosophers = ft_atol(argv[1]);
-	if (table->number_of_philosophers < 1
-		|| table->number_of_philosophers > 200)
+	table->n_philos = ft_atol(argv[1]);
+	if (table->n_philos < 1 || table->n_philos > 200)
 		exit_with_error_msg("<num> should be a number between 1 and 200.");
 	table->time_to_die = parse_time(argv[2]) * 1000L;
 	table->time_to_eat = parse_time(argv[3]) * 1000L;

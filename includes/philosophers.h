@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 16:25:59 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/23 19:32:01 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/24 02:02:30 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,15 @@ typedef struct s_philo
 
 struct					s_table
 {
-	long				number_of_philosophers;
+	long				n_philos;
 	long				time_to_die;
 	long				time_to_eat;
 	long				time_to_sleep;
 	long				meal_limit;
 	long				starting_time;
 	t_philo				*philos;
+	pthread_t			monitor;
+	long				n_philos_ready;
 	t_fork				*forks;
 	bool				end_simulation;
 	bool				start_simulation;
@@ -68,6 +70,7 @@ typedef enum e_status
 void					exit_with_error_msg(const char *msg);
 long					get_time_ms(void);
 void					safe_log_status(t_status status, t_philo *philo);
+void					clean(t_table *table);
 
 void					parse_input(t_table *table, const char **argv);
 
