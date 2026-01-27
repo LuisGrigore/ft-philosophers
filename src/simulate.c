@@ -6,7 +6,7 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:05:55 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/24 23:58:21 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/27 17:10:53 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static void	eat(t_philo *philo)
 		get_time_ms());
 	philo->meal_counter++;
 	safe_log_status(EATING, philo);
-	safe_usleep(philo->table->time_to_eat);
+	safe_usleep(philo->table->time_to_eat, philo->table);
 	if (philo->table->meal_limit > 0
 		&& philo->meal_counter == philo->table->meal_limit)
 		safe_set_bool(&philo->philo_mutex, &philo->is_full, true);
@@ -51,7 +51,7 @@ void	*philo_start(void *philo_ptr)
 			break ;
 		eat(philo);
 		safe_log_status(SLEEPING, philo);
-		safe_usleep(table->time_to_sleep);
+		safe_usleep(table->time_to_sleep, table);
 		safe_log_status(THINKING, philo);
 		usleep(500);
 	}
