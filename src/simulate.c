@@ -6,147 +6,34 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 15:05:55 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/27 17:10:53 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:10:08 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 #include <unistd.h>
 
-static void	eat(t_philo *philo)
+static void	simulate_with_one_philo(t_table *table)
 {
-	safe_mutex_op(&philo->right_fork->mutex, LOCK);
-	safe_log_status(FORK_TAKEN, philo);
-	safe_mutex_op(&philo->left_fork->mutex, LOCK);
-	safe_log_status(FORK_TAKEN, philo);
-	safe_set_long(&philo->philo_mutex, &philo->time_of_last_meal,
-		get_time_ms());
-	philo->meal_counter++;
-	safe_log_status(EATING, philo);
-	safe_usleep(philo->table->time_to_eat, philo->table);
-	if (philo->table->meal_limit > 0
-		&& philo->meal_counter == philo->table->meal_limit)
-		safe_set_bool(&philo->philo_mutex, &philo->is_full, true);
-	safe_mutex_op(&philo->right_fork->mutex, UNLOCK);
-	safe_mutex_op(&philo->left_fork->mutex, UNLOCK);
+	safe_thread_op(&table->philos[0].thread_id, one_philo_routine,
+		&table->philos[0], CREATE);
+	safe_thread_op(&table->monitor, monitor_routine, table, CREATE);
+	table->starting_time = get_time_ms();
+	safe_set_bool(&table->table_mutex, &table->start_simulation, true);
+	safe_thread_op(&table->philos[0].thread_id, NULL, NULL, JOIN);
+	safe_set_bool(&table->table_mutex, &table->end_simulation, true);
+	safe_thread_op(&table->monitor, NULL, NULL, JOIN);
 }
 
-void	*philo_start(void *philo_ptr)
-{
-	t_philo	*philo;
-	t_table	*table;
-
-	philo = (t_philo *)philo_ptr;
-	table = philo->table;
-	while (!safe_get_bool(&table->table_mutex, &table->start_simulation))
-		;
-	safe_set_long(&philo->philo_mutex, &philo->time_of_last_meal,
-		get_time_ms());
-	safe_mutex_op(&table->table_mutex, LOCK);
-	table->n_philos_ready++;
-	safe_mutex_op(&table->table_mutex, UNLOCK);
-	while (!safe_get_bool(&table->table_mutex, &table->end_simulation))
-	{
-		if (philo->is_full)
-			break ;
-		eat(philo);
-		safe_log_status(SLEEPING, philo);
-		safe_usleep(table->time_to_sleep, table);
-		safe_log_status(THINKING, philo);
-		usleep(500);
-	}
-	return (NULL);
-}
-
-static bool	philo_died(t_philo *philo)
-{
-	long	time_passed;
-
-	if (safe_get_bool(&philo->philo_mutex, &philo->is_full))
-		return (false);
-	time_passed = get_time_ms() - safe_get_long(&philo->philo_mutex,
-			&philo->time_of_last_meal);
-	if (time_passed > philo->table->time_to_die / 1e3)
-		return (true);
-	return (false);
-}
-
-void	*monitor_start(void *table_ptr)
-{
-	t_table	*table;
-	int		i;
-
-	table = (t_table *)table_ptr;
-	while (!safe_get_bool(&table->table_mutex, &table->start_simulation)
-		|| safe_get_long(&table->table_mutex,
-			&table->n_philos_ready) < table->n_philos)
-		;
-	while (!safe_get_bool(&table->table_mutex, &table->end_simulation))
-	{
-		i = -1;
-		while (++i < table->n_philos && !safe_get_bool(&table->table_mutex,
-				&table->end_simulation))
-		{
-			if (philo_died(table->philos + i))
-			{
-				safe_set_bool(&table->table_mutex, &table->end_simulation,
-					true);
-				safe_log_status(DIED, table->philos + i);
-			}
-		}
-		usleep(500);
-	}
-	return (NULL);
-}
-
-void	*one_philo_start(void *philo_ptr)
-{
-	t_philo	*philo;
-	t_table	*table;
-
-	philo = (t_philo *)philo_ptr;
-	table = philo->table;
-	while (!safe_get_bool(&table->table_mutex, &table->start_simulation))
-		usleep(100);
-	safe_set_long(&philo->philo_mutex, &philo->time_of_last_meal, get_time_ms());
-	safe_mutex_op(&table->table_mutex, LOCK);
-	table->n_philos_ready++;
-	safe_mutex_op(&table->table_mutex, UNLOCK);
-	safe_mutex_op(&philo->left_fork->mutex, LOCK);
-	safe_log_status(FORK_TAKEN, philo);
-	while (!safe_get_bool(&table->table_mutex, &table->end_simulation))
-	{
-		long time_passed = get_time_ms() - safe_get_long(&philo->philo_mutex, &philo->time_of_last_meal);
-		if (time_passed >= table->time_to_die)
-			break ;
-		usleep(100);
-	}
-	return (NULL);
-}
-
-void	start_simulation(t_table *table)
+static void	simulate_with_many_philos(t_table *table)
 {
 	int	i;
 
-	if (table->meal_limit == 0)
-		return ;
-	if (table->n_philos == 1)
-	{
-		safe_thread_op(&table->philos[0].thread_id, one_philo_start,
-			&table->philos[0], CREATE);
-		safe_thread_op(&table->monitor, monitor_start, table, CREATE);
-		table->starting_time = get_time_ms();
-		safe_set_bool(&table->table_mutex, &table->start_simulation, true);
-		safe_thread_op(&table->philos[0].thread_id, NULL, NULL, JOIN);
-		safe_set_bool(&table->table_mutex, &table->end_simulation, true);
-		safe_thread_op(&table->monitor, NULL, NULL, JOIN);
-		return;
-	}
 	i = -1;
 	while (++i < table->n_philos)
-		safe_thread_op(&table->philos[i].thread_id, philo_start,
+		safe_thread_op(&table->philos[i].thread_id, many_philos_routine,
 			&table->philos[i], CREATE);
-	safe_thread_op(&table->monitor, monitor_start, table, CREATE);
+	safe_thread_op(&table->monitor, monitor_routine, table, CREATE);
 	table->starting_time = get_time_ms();
 	safe_set_bool(&table->table_mutex, &table->start_simulation, true);
 	i = -1;
@@ -154,4 +41,16 @@ void	start_simulation(t_table *table)
 		safe_thread_op(&table->philos[i].thread_id, NULL, NULL, JOIN);
 	safe_set_bool(&table->table_mutex, &table->end_simulation, true);
 	safe_thread_op(&table->monitor, NULL, NULL, JOIN);
+}
+
+void	simulate(t_table *table)
+{
+	if (table->meal_limit == 0)
+		return ;
+	if (table->n_philos == 1)
+	{
+		simulate_with_one_philo(table);
+		return ;
+	}
+	simulate_with_many_philos(table);
 }

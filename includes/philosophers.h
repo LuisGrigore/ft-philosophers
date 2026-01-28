@@ -6,15 +6,20 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 16:25:59 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/27 17:11:28 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:10:23 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
+# include <limits.h>
 # include <pthread.h>
 # include <stdbool.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <sys/time.h>
+# include <unistd.h>
 
 typedef pthread_mutex_t	t_mutex;
 
@@ -70,15 +75,13 @@ typedef enum e_status
 void					exit_with_error_msg(const char *msg);
 long					get_time_ms(void);
 void					safe_log_status(t_status status, t_philo *philo);
-void					clean(t_table *table);
-void 					safe_usleep(long usec, t_table *table);
-
+void					safe_usleep(long usec, t_table *table);
 
 void					parse_input(t_table *table, const char **argv);
 
 void					init_table(t_table *table);
 
-void					start_simulation(t_table *table);
+void					simulate(t_table *table);
 
 typedef enum e_mux_op
 {
@@ -104,5 +107,9 @@ void					safe_set_bool(t_mutex *mutx, bool *target, bool value);
 bool					safe_get_bool(t_mutex *mutx, bool *target);
 void					safe_set_long(t_mutex *mutx, long *target, long value);
 long					safe_get_long(t_mutex *mutx, long *target);
+
+void					*many_philos_routine(void *philo_ptr);
+void					*one_philo_routine(void *philo_ptr);
+void					*monitor_routine(void *table_ptr);
 
 #endif

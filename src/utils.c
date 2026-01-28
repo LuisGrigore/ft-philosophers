@@ -6,15 +6,21 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:05:18 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/27 17:07:43 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:09:39 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
+
+void	*safe_malloc(size_t size)
+{
+	void	*space;
+
+	space = malloc(size);
+	if (!space)
+		exit_with_error_msg("Malloc failed.");
+	return (space);
+}
 
 long	get_time_ms(void)
 {
@@ -58,27 +64,16 @@ void	safe_log_status(t_status status, t_philo *philo)
 	safe_mutex_op(&philo->table->print_mutex, UNLOCK);
 }
 
-void	clean(t_table *table)
+void	safe_usleep(long usec, t_table *table)
 {
-	int	i;
+	long	start;
+	long	target;
 
-	i = -1;
-	while (++i < table->n_philos)
-		safe_mutex_op(&(table->philos + i)->philo_mutex, FREE);
-	safe_mutex_op(&table->table_mutex, FREE);
-	safe_mutex_op(&table->print_mutex, FREE);
-	free(table->forks);
-	free(table->philos);
+	start = get_time_ms();
+	target = usec / 1000;
+	while ((get_time_ms() - start) < target
+		&& !safe_get_bool(&table->table_mutex, &table->end_simulation))
+	{
+		usleep(100);
+	}
 }
-
-void safe_usleep(long usec, t_table *table)
-{
-    long start = get_time_ms();
-    long target = usec / 1000;
-
-    while ((get_time_ms() - start) < target && !safe_get_bool(&table->table_mutex, &table->end_simulation))
-    {
-        usleep(100);
-    }
-}
-

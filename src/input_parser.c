@@ -6,12 +6,11 @@
 /*   By: lgrigore <lgrigore@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 13:15:12 by lgrigore          #+#    #+#             */
-/*   Updated: 2026/01/24 02:55:18 by lgrigore         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:11:12 by lgrigore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
-#include <limits.h>
 
 static long	ft_atol(const char *str)
 {
@@ -80,7 +79,7 @@ static long	parse_time(const char *str)
 	time = ft_atol(str);
 	if (time < 60 || time > INT_MAX)
 		exit_with_error_msg("<time_to_die> <time_to_eat> <time_to_sleep> "
-							"should be numbers between 60 and INT_MAX.");
+			"should be numbers between 60 and INT_MAX.");
 	return (time);
 }
 
